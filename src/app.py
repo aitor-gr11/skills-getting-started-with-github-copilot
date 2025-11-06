@@ -20,43 +20,43 @@ app.mount("/static", StaticFiles(directory=os.path.join(Path(__file__).parent,
           "static")), name="static")
 
 # In-memory activity database
-"Soccer Team": {
-    "description": "Outdoor team sport focusing on skills, teamwork, and competition",
-    "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:30 PM",
-    "max_participants": 22,
-    "participants": ["liam@mergington.edu", "ava@mergington.edu"]
-},
-"Basketball Club": {
-    "description": "Skill development and intramural games for all levels",
-    "schedule": "Mondays and Wednesdays, 4:00 PM - 6:00 PM",
-    "max_participants": 15,
-    "participants": ["noah@mergington.edu", "mia@mergington.edu"]
-},
-"Art Club": {
-    "description": "Explore painting, drawing, and mixed media projects",
-    "schedule": "Wednesdays, 3:30 PM - 5:00 PM",
-    "max_participants": 18,
-    "participants": ["isabella@mergington.edu", "charlotte@mergington.edu"]
-},
-"Drama Club": {
-    "description": "Acting, stagecraft, and production of school plays",
-    "schedule": "Fridays, 3:30 PM - 6:00 PM",
-    "max_participants": 25,
-    "participants": ["jack@mergington.edu", "grace@mergington.edu"]
-},
-"Robotics Club": {
-    "description": "Design and build robots; learn programming and engineering",
-    "schedule": "Tuesdays, 4:00 PM - 6:00 PM",
-    "max_participants": 12,
-    "participants": ["lucas@mergington.edu", "amelia@mergington.edu"]
-},
-"Debate Team": {
-    "description": "Competitive debating, public speaking, and research skills",
-    "schedule": "Thursdays, 4:00 PM - 5:30 PM",
-    "max_participants": 16,
-    "participants": ["benjamin@mergington.edu", "ella@mergington.edu"]
-},
 activities = {
+    "Soccer Team": {
+        "description": "Outdoor team sport focusing on skills, teamwork, and competition",
+        "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:30 PM",
+        "max_participants": 22,
+        "participants": ["liam@mergington.edu", "ava@mergington.edu"]
+    },
+    "Basketball Club": {
+        "description": "Skill development and intramural games for all levels",
+        "schedule": "Mondays and Wednesdays, 4:00 PM - 6:00 PM",
+        "max_participants": 15,
+        "participants": ["noah@mergington.edu", "mia@mergington.edu"]
+    },
+    "Art Club": {
+        "description": "Explore painting, drawing, and mixed media projects",
+        "schedule": "Wednesdays, 3:30 PM - 5:00 PM",
+        "max_participants": 18,
+        "participants": ["isabella@mergington.edu", "charlotte@mergington.edu"]
+    },
+    "Drama Club": {
+        "description": "Acting, stagecraft, and production of school plays",
+        "schedule": "Fridays, 3:30 PM - 6:00 PM",
+        "max_participants": 25,
+        "participants": ["jack@mergington.edu", "grace@mergington.edu"]
+    },
+    "Robotics Club": {
+        "description": "Design and build robots; learn programming and engineering",
+        "schedule": "Tuesdays, 4:00 PM - 6:00 PM",
+        "max_participants": 12,
+        "participants": ["lucas@mergington.edu", "amelia@mergington.edu"]
+    },
+    "Debate Team": {
+        "description": "Competitive debating, public speaking, and research skills",
+        "schedule": "Thursdays, 4:00 PM - 5:30 PM",
+        "max_participants": 16,
+        "participants": ["benjamin@mergington.edu", "ella@mergington.edu"]
+    },
     "Chess Club": {
         "description": "Learn strategies and compete in chess tournaments",
         "schedule": "Fridays, 3:30 PM - 5:00 PM",
@@ -109,3 +109,20 @@ def signup_for_activity(activity_name: str, email: str):
     # Add student
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+@app.delete("/activities/{activity_name}/participants")
+def remove_participant(activity_name: str, email: str):
+    """Remove a student from an activity's participants list"""
+    # Validate activity exists
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    activity = activities[activity_name]
+
+    # Validate participant exists
+    if email not in activity.get("participants", []):
+        raise HTTPException(status_code=404, detail="Participant not found in activity")
+
+    activity["participants"].remove(email)
+    return {"message": f"Removed {email} from {activity_name}"}
